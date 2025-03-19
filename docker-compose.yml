@@ -1,0 +1,22 @@
+services:
+  redis:
+    image: redis
+
+  yarpapigateaway:
+    image: ${DOCKER_REGISTRY-}yarpapigateaway
+    build:
+      context: .
+      dockerfile: gateaway/YarpApiGateaway/Dockerfile
+
+  userauth.api:
+    image: ${DOCKER_REGISTRY-}userauthapi
+    build:
+      context: .
+      dockerfile: microservices/UserAuth/UserAuth.API/Dockerfile
+  userauth.api.migrations:
+    image: ${DOCKER_REGISTRY-}userauthapi
+    build:
+      context: .
+      dockerfile: microservices/UserAuth/UserAuth.API/Dockerfile
+  
+

@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "redis": "StartWithoutDebugging",
+        "userauth.api": "StartDebugging",
+        "userauth.api.migrations": "DoNotStart",
+        "yarpapigateaway": "StartDebugging"
+      }
+    }
+  }
+}

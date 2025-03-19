@@ -1,0 +1,64 @@
+services:
+  redis:
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  yarpapigateaway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_HTTP_PORTS=8080
+    env_file:
+      - .env
+      - gateaway\YarpApiGateaway\.env
+    ports:
+      - "5000:8080"
+      - "5050:8081"
+    volumes:
+      - ./certificates/aspnetapp.pfx:/https/aspnetapp.pfx:ro 
+    networks:
+      - internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - userauth.api
+  userauth.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_HTTP_PORTS=8080
+    env_file:
+      - .env
+      - microservices/UserAuth/UserAuth.API/.env
+    ports:
+      - "5001:8080"
+      - "5051:8081"
+    volumes:
+      - ./certificates/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+    depends_on:
+      - redis
+    networks:
+      - internal
+  userauth.api.migrations:
+    profiles: ["migrations"]
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Migration
+    env_file:
+      - microservices/UserAuth/UserAuth.API/.env
+    networks:
+      - internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  internal:
+    name: internal
+    driver: bridge
+
+volumes:
+  redis_data:
+
+
