@@ -4,11 +4,11 @@ using Application.Interfaces.Services;
 using Domain.Interfaces.Repositories;
 using Infrastructure.Repositories;
 using Application.Services;
-using UserAuth.API.Middlewares;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Features.Users.Queries.GetUserById;
+using BuildingBlocks.Exceptions;
 
 namespace UserAuth.API.Services.App
 {
@@ -18,13 +18,10 @@ namespace UserAuth.API.Services.App
         {
             services.AddHttpContextAccessor();
 
-            services.AddAuthentication();
-            services.AddAuthorization();
             services.ConfigureCors(configuration);
             services.ConfigureContextNpgsql(configuration);
             services.ConfigureRedis(configuration);
             services.ConfigureSwagger();
-            services.ConfigureAuthentication(configuration);
             services.ConfigureIdentity();
             //var assembly = typeof(Program).Assembly;
             //services.AddMediatR(config =>
@@ -38,7 +35,6 @@ namespace UserAuth.API.Services.App
             services.AddScoped<IAppConfiguration, AppConfiguration>();
            // services.AddScoped<IAuthorizationFilter, AuthorizeTokenValidationFilter>();
             services.AddScoped<IRefreshTokenStore, RedisRefreshTokenStore>();
-            
 
 
             services.AddScoped<IUserRepository, UserRepository>();
@@ -55,7 +51,7 @@ namespace UserAuth.API.Services.App
               //  options.Filters.Add<AuthorizeTokenValidationFilter>(); 
             });
 
-            services.AddScoped<GlobalExceptionMiddleware>();
+            services.AddTransient<GlobalExceptionMiddleware>();
 
             services.Configure<RouteOptions>(options => {
                 options.LowercaseUrls = true;

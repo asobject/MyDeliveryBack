@@ -1,6 +1,4 @@
-﻿
-
-namespace Application.Exceptions;
+﻿namespace BuildingBlocks.Exceptions;
 
 public class InvalidTokenException(string message) : Exception(message) { }
 public class NotFoundException(string message) : Exception(message) { }

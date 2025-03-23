@@ -13,6 +13,6 @@ public interface IRefreshTokenStore
        string newRefreshToken);
     Task RevokeTokenAsync(string userId, string jti);
     Task<string?> GetTokenAsync(string userId, string jti);
-
+    Task<bool> TokenExistsAsync(string userId, string jti);
 
 }

@@ -1,8 +1,8 @@
 ﻿
 
 using Application.DTOs;
-using Application.Exceptions;
 using Application.Interfaces.Services;
+using BuildingBlocks.Exceptions;
 using Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,8 +24,8 @@ public class TokenService(IAppConfiguration configuration) : ITokenService
 
     public JwtSecurityToken GenerateAccessToken(List<Claim> authClaims)
     {
-        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue("JWT_SECRET")));
-        _ = int.TryParse(configuration.GetValue("JWT_ACCESS_TOKEN_VALIDITY"), out int tokenValidityInMinutes);
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue("JWT_USER_SECRET")));
+        _ = int.TryParse(configuration.GetValue("JWT_CLIENT_ACCESS_TOKEN_VALIDITY"), out int tokenValidityInMinutes);
 
         var token = new JwtSecurityToken(
             issuer: configuration.GetValue("JWT_ISSUER"),
@@ -44,7 +44,7 @@ public class TokenService(IAppConfiguration configuration) : ITokenService
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue("JWT_SECRET"))),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue("JWT_USER_SECRET"))),
             ValidateLifetime = false
         };
 
@@ -62,20 +62,27 @@ public class TokenService(IAppConfiguration configuration) : ITokenService
             var principal = ValidateToken(accessToken);
             var claims = principal.Claims;
 
-            string GetClaimValue(string type) => claims.FirstOrDefault(c => c.Type == type)?.Value
-                ?? throw new InvalidTokenException($"Missing {type} claim");
+            string GetClaimValue(params string[] types)
+            {
+                foreach (var type in types)
+                {
+                    var claim = claims.FirstOrDefault(c => c.Type == type);
+                    if (claim != null) return claim.Value;
+                }
+                throw new InvalidTokenException($"Missing required claims: {string.Join(", ", types)}");
+            }
 
-            var expValue = GetClaimValue("exp");
+            var expValue = GetClaimValue(ClaimTypes.Expired, "exp");
             if (!long.TryParse(expValue, out var unixTime))
                 throw new InvalidTokenException("Invalid exp format");
 
             return new TokenDataDTO
             {
-                Sub = GetClaimValue("sub"),
+                Email = GetClaimValue(ClaimTypes.Email,"email"),
+                Sub = GetClaimValue(ClaimTypes.NameIdentifier,"sub"),
                 Jti = GetClaimValue("jti"),
-                Email = GetClaimValue("email"),
                 FirstName = GetClaimValue("firstName"),
-                Roles = claims.Where(c => c.Type == "roles").Select(c => c.Value).ToList(),
+                Roles = [.. claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "roles").Select(c => c.Value)],
                 Exp = DateTimeOffset.FromUnixTimeSeconds(unixTime).UtcDateTime
             };
         }
@@ -100,7 +107,7 @@ public class TokenService(IAppConfiguration configuration) : ITokenService
         var refreshToken = GenerateRefreshToken();
 
         var refreshTokenExpiryTime = DateTime.Now.AddDays(
-            int.TryParse(configuration.GetValue("JWT_REFRESH_TOKEN_VALIDITY"), out var days) ? days : 7
+            int.TryParse(configuration.GetValue("JWT_USER_REFRESH_TOKEN_VALIDITY"), out var days) ? days : 7
         );
         return (new JwtSecurityTokenHandler().WriteToken(token), refreshToken, refreshTokenExpiryTime);
     }

@@ -1,7 +1,7 @@
 ﻿
 
-using Application.Exceptions;
 using Application.Interfaces.Services;
+using BuildingBlocks.Exceptions;
 using Domain.Interfaces.Repositories;
 using MediatR;
 using System.Security.Claims;
@@ -26,10 +26,10 @@ public class RefreshTokenUserCommandHandler(
 
         var storedToken = await refreshTokenStore.GetTokenAsync(user.Id, oldAccessTokenData.Jti);
 
-        if (storedToken !=  request.RefreshToken || oldAccessTokenData.Exp <= DateTime.UtcNow)
+        if (storedToken !=  request.RefreshToken)
         {
             await refreshTokenStore.RevokeTokenAsync(user.Id, oldAccessTokenData.Jti);
-            throw new InvalidTokenException("Invalid access token");
+            throw new InvalidTokenException("Invalid refresh token");
         }
 
         var userRoles = await userRepository.GetRolesAsync(user);

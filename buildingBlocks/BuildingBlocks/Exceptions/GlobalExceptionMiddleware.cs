@@ -1,10 +1,8 @@
-using Application.Exceptions;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Net;
-using System.Threading.Tasks;
-namespace UserAuth.API.Middlewares;
+namespace BuildingBlocks.Exceptions;
 
 
 public class GlobalExceptionMiddleware(ILogger<GlobalExceptionMiddleware> logger) : IMiddleware

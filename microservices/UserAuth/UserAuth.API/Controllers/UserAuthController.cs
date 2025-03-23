@@ -1,7 +1,10 @@
 ﻿
 using Application.Features.Users.Commands.LoginUser;
+using Application.Features.Users.Commands.LogoutUser;
+using Application.Features.Users.Commands.RefreshTokenUser;
 using Application.Features.Users.Commands.RegisterUser;
 using Application.Features.Users.Queries.GetUserById;
+using Application.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,8 +12,8 @@ using System.Threading.Tasks;
 namespace UserAuth.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class UserAuthController(IMediator mediator) : ControllerBase
+[Route("api/user-auth")]
+public class UserAuthController(IMediator mediator, ITokenExtractionService tokenExtractionService) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
@@ -40,18 +43,26 @@ public class UserAuthController(IMediator mediator) : ControllerBase
             ? NotFound()
             : Ok(user);
     }
-    //[Authorize(AuthenticationSchemes = "AllowExpiredToken")]
-    //[HttpPut("refresh")]
-    //public async Task<IActionResult> RefreshToken()
-    //{
-    //    var response = await authService.RefreshTokenAsync();
-    //    return Ok(response); 
-    //}
-    //[Authorize(AuthenticationSchemes = "AllowExpiredToken")]
-    //[HttpPost("logout")]
-    //public async Task<IActionResult> Logout()
-    //{
-    //    await authService.SignOutAsync();
-    //    return NoContent();
-    //}
+    [HttpPut("refresh")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        RefreshTokenUserCommand command = new()
+        {
+            AccessToken = tokenExtractionService.GetAccessTokenFromHeader(),
+            RefreshToken = tokenExtractionService.GetRefreshTokenFromCookie()
+        };
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        LogoutUserCommand command = new()
+        {
+            AccessToken = tokenExtractionService.GetAccessTokenFromHeader(),
+            RefreshToken = tokenExtractionService.GetRefreshTokenFromCookie()
+        };
+        _ = await mediator.Send(command);
+        return NoContent();
+    }
 }

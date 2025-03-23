@@ -1,6 +1,6 @@
 ﻿
-using Application.Exceptions;
 using Application.Interfaces.Services;
+using BuildingBlocks.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
@@ -47,7 +47,7 @@ public class TokenExtractionService(IHttpContextAccessor httpContextAccessor, IA
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(appConfiguration.GetValue("JWT_REFRESH_TOKEN_VALIDITY")))
+            Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(appConfiguration.GetValue("JWT_USER_REFRESH_TOKEN_VALIDITY")))
         };
         context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }

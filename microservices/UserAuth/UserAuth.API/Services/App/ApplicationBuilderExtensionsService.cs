@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using BuildingBlocks.Exceptions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
-using UserAuth.API.Middlewares;
 
 namespace UserAuth.API.Services.App
 {
@@ -22,9 +22,6 @@ namespace UserAuth.API.Services.App
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseMiddleware<GlobalExceptionMiddleware>();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
 
             app.MapControllers();
         }

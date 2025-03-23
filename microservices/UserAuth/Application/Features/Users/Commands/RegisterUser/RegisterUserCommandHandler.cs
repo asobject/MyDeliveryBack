@@ -1,4 +1,5 @@
-﻿using Application.Exceptions;
+﻿
+using BuildingBlocks.Exceptions;
 using Domain.Entities;
 using Domain.Interfaces.Repositories;
 using MediatR;
