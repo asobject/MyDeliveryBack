@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Services;
+﻿using BuildingBlocks.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 
 namespace UserAuth.API.Services.App

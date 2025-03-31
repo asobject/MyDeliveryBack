@@ -3,6 +3,7 @@
 using Application.DTOs;
 using Application.Interfaces.Services;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Interfaces.Services;
 using Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

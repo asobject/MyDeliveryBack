@@ -3,8 +3,8 @@ using Application.Features.Users.Commands.LoginUser;
 using Application.Features.Users.Commands.LogoutUser;
 using Application.Features.Users.Commands.RefreshTokenUser;
 using Application.Features.Users.Commands.RegisterUser;
-using Application.Features.Users.Queries.GetUserById;
-using Application.Interfaces.Services;
+using Application.Features.Users.Queries.GetUserByEmail;
+using BuildingBlocks.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -18,9 +18,9 @@ public class UserAuthController(IMediator mediator, ITokenExtractionService toke
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
-        var response = await mediator.Send(command);
-
-        return CreatedAtAction(nameof(GetUserById), new { id = response.UserId }, response);
+        _ = await mediator.Send(command);
+        return Created();
+        //return CreatedAtAction(nameof(GetUserByEmail), new { email = response.Email }, response);
     }
 
     [HttpPost("login")]
@@ -30,18 +30,27 @@ public class UserAuthController(IMediator mediator, ITokenExtractionService toke
 
         return Ok(response);
     }
-    [HttpGet("users/{id}")]
-    public async Task<IActionResult> GetUserById(string id)
+    //[HttpGet("users")]
+    //public async Task<IActionResult> GetUserById([FromQuery] string id)
+    //{
+    //    GetUserByIdQuery query = new()
+    //    {
+    //        Id = id
+    //    };
+    //    var user = await mediator.Send(query);
+
+    //    return Ok(user);
+    //}
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
     {
-        GetUserByIdQuery query = new()
+        GetUserByEmailQuery query = new()
         {
-            UserId = id
+            Email = email
         };
         var user = await mediator.Send(query);
 
-        return user == null
-            ? NotFound()
-            : Ok(user);
+        return Ok(user);
     }
     [HttpPut("refresh")]
     public async Task<IActionResult> RefreshToken()

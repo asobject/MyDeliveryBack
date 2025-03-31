@@ -1,11 +1,9 @@
-﻿
-
-using MediatR;
+﻿using MediatR;
 
 namespace Application.Features.Users.Queries.GetUserById;
 
 public class GetUserByIdQuery : IRequest<GetUserByIdResponse>
 {
-    public string UserId { get; set; } = null!;
+    public string Id { get; set; } = null!;
 }
 

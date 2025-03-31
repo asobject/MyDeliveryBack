@@ -25,7 +25,7 @@ public class RegisterUserCommandHandler(IUserRepository userRepository)
         var user = new ApplicationUser
         {
             FirstName = request.FirstName,
-            UserName=request.Email,
+            UserName = request.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
             Email = request.Email
         };
@@ -35,7 +35,7 @@ public class RegisterUserCommandHandler(IUserRepository userRepository)
 
         return new RegisterUserResponse
         {
-            UserId = user.Id,
+            Id = user.Id,
             Message = "User registered successfully"
         };
     }

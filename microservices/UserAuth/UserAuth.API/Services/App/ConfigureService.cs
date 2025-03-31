@@ -7,8 +7,9 @@ using Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Features.Users.Queries.GetUserById;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Interfaces.Services;
+using Application.Features.Users.Queries.GetUserById;
 
 namespace UserAuth.API.Services.App
 {
@@ -23,6 +24,7 @@ namespace UserAuth.API.Services.App
             services.ConfigureRedis(configuration);
             services.ConfigureSwagger();
             services.ConfigureIdentity();
+            services.ConfigureRabbit(configuration);
             //var assembly = typeof(Program).Assembly;
             //services.AddMediatR(config =>
             //{
@@ -33,7 +35,6 @@ namespace UserAuth.API.Services.App
          cfg.RegisterServicesFromAssembly(typeof(GetUserByIdQuery).Assembly));
 
             services.AddScoped<IAppConfiguration, AppConfiguration>();
-           // services.AddScoped<IAuthorizationFilter, AuthorizeTokenValidationFilter>();
             services.AddScoped<IRefreshTokenStore, RedisRefreshTokenStore>();
 
 
@@ -43,13 +44,10 @@ namespace UserAuth.API.Services.App
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ITokenExtractionService, TokenExtractionService>();
 
-
+            services.AddControllers();
 
             services.AddLogging();
-            services.AddControllers(options =>
-            {
-              //  options.Filters.Add<AuthorizeTokenValidationFilter>(); 
-            });
+           
 
             services.AddTransient<GlobalExceptionMiddleware>();
 

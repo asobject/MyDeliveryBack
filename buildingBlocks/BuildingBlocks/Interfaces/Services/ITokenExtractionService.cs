@@ -1,6 +1,4 @@
-﻿
-
-namespace Application.Interfaces.Services;
+﻿namespace BuildingBlocks.Interfaces.Services;
 
 public interface ITokenExtractionService
 {

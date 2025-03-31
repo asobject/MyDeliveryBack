@@ -30,10 +30,7 @@ namespace YarpApiGateaway
                 options.AddDefaultPolicy(policy =>
                 {
                     policy.WithOrigins(
-                            "http://localhost:4200",
-                            "http://angular-admin",
-                            "http://angular-client",
-                            "http://angular-worker")
+                            "https://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -55,6 +52,7 @@ namespace YarpApiGateaway
             builder.Services.AddTransient<GlobalExceptionMiddleware>();
 
             var app = builder.Build();
+            app.UseCors();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();

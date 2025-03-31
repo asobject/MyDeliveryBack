@@ -14,6 +14,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["microservices/UserAuth/UserAuth.API/UserAuth.API.csproj", "microservices/UserAuth/UserAuth.API/"]
 COPY ["microservices/UserAuth/Application/Application.csproj", "microservices/UserAuth/Application/"]
+COPY ["buildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "buildingBlocks/BuildingBlocks/"]
 COPY ["microservices/UserAuth/Domain/Domain.csproj", "microservices/UserAuth/Domain/"]
 COPY ["microservices/UserAuth/Infrastructure/Infrastructure.csproj", "microservices/UserAuth/Infrastructure/"]
 RUN dotnet restore "./microservices/UserAuth/UserAuth.API/UserAuth.API.csproj"

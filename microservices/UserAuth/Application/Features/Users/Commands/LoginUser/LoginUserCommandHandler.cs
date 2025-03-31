@@ -2,6 +2,7 @@
 
 using Application.Interfaces.Services;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Interfaces.Services;
 using Domain.Interfaces.Repositories;
 using MediatR;
 using System.Security.Claims;

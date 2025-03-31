@@ -1,8 +1,10 @@
 services:
   redis:
     image: redis
+  rabbitmq:
+    image: rabbitmq:management
 
-  yarpapigateaway:
+  api-gateaway:
     image: ${DOCKER_REGISTRY-}yarpapigateaway
     build:
       context: .
@@ -19,4 +21,16 @@ services:
       context: .
       dockerfile: microservices/UserAuth/UserAuth.API/Dockerfile
   
+
+
+  order.api:
+    image: ${DOCKER_REGISTRY-}orderapi
+    build:
+      context: .
+      dockerfile: microservices/Order/Order.API/Dockerfile
+  order.api.migrations:
+    image: ${DOCKER_REGISTRY-}orderapi
+    build:
+      context: .
+      dockerfile: microservices/Order/Order.API/Dockerfile
 

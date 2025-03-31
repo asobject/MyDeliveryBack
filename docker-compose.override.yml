@@ -8,7 +8,22 @@ services:
       - redis_data:/data
     networks:
       - internal
-  yarpapigateaway:
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: ecommerce-mq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - internal
+      
+  api-gateaway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTPS_PORTS=8081
@@ -25,6 +40,8 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - userauth.api
+      - order.api
+
   userauth.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -34,10 +51,11 @@ services:
       - .env
       - microservices/UserAuth/UserAuth.API/.env
     ports:
-      - "5001:8080"
-      - "5051:8081"
+      - "5010:8080"
+      - "5060:8081"
     depends_on:
       - redis
+      - rabbitmq
     networks:
       - internal
   userauth.api.migrations:
@@ -51,12 +69,39 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  order.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+    ports:
+      - "5020:8080"
+      - "5070:8081"
+    env_file:
+      - .env
+      - microservices/Order/Order.API/.env
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - internal
+  order.api.migrations:
+    profiles: ["migrations"]
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Migration
+    env_file:
+      - microservices/Order/Order.API/.env
+    networks:
+      - internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 networks:
   internal:
     name: internal
     driver: bridge
 
 volumes:
+  rabbitmq_data:
   redis_data:
-
-
+  

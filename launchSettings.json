@@ -7,7 +7,10 @@
         "redis": "StartWithoutDebugging",
         "userauth.api": "StartDebugging",
         "userauth.api.migrations": "DoNotStart",
-        "yarpapigateaway": "StartDebugging"
+        "api-gateaway": "StartDebugging",
+        "order.api": "StartDebugging",
+        "order.api.migrations": "DoNotStart",
+        "rabbitmq": "StartWithoutDebugging"
       }
     }
   }

@@ -1,6 +1,4 @@
-﻿
-
-using BuildingBlocks.Exceptions;
+﻿using BuildingBlocks.Exceptions;
 using Domain.Interfaces.Repositories;
 using MediatR;
 
@@ -13,12 +11,11 @@ public class GetUserByIdQueryHandler(IUserRepository userRepository)
     GetUserByIdQuery request,
     CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByIdAsync(request.UserId)
-        ?? throw new NotFoundException($"User with ID {request.UserId} not found");
+        var user = await userRepository.GetByIdAsync(request.Id)
+        ?? throw new NotFoundException($"User with ID {request.Id} not found");
 
         return new GetUserByIdResponse
         {
-            FirstName = user.FirstName,
             Email = user.Email!
         };
     }
