@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,7 +21,33 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.CustomPoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Point>("Coordinates")
+                        .IsRequired()
+                        .HasColumnType("geography(Point, 4326)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Coordinates");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Coordinates"), "GIST");
+
+                    b.ToTable("CustomPoints");
+                });
 
             modelBuilder.Entity("Domain.Entities.DeliveryPoint", b =>
                 {
@@ -30,16 +57,18 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
                     b.Property<int?>("CompanyPointId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CustomPointId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Method")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomPointId");
 
                     b.ToTable("DeliveryPoints");
                 });
@@ -103,6 +132,16 @@ namespace Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("Domain.Entities.DeliveryPoint", b =>
+                {
+                    b.HasOne("Domain.Entities.CustomPoint", "CustomPoint")
+                        .WithMany("DeliveryPoints")
+                        .HasForeignKey("CustomPointId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CustomPoint");
+                });
+
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.HasOne("Domain.Entities.DeliveryPoint", "ReceiverDeliveryPoint")
@@ -120,6 +159,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("ReceiverDeliveryPoint");
 
                     b.Navigation("SenderDeliveryPoint");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CustomPoint", b =>
+                {
+                    b.Navigation("DeliveryPoints");
                 });
 
             modelBuilder.Entity("Domain.Entities.DeliveryPoint", b =>

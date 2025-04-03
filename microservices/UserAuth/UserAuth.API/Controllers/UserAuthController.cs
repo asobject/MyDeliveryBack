@@ -3,7 +3,6 @@ using Application.Features.Users.Commands.LoginUser;
 using Application.Features.Users.Commands.LogoutUser;
 using Application.Features.Users.Commands.RefreshTokenUser;
 using Application.Features.Users.Commands.RegisterUser;
-using Application.Features.Users.Queries.GetUserByEmail;
 using BuildingBlocks.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,17 +40,17 @@ public class UserAuthController(IMediator mediator, ITokenExtractionService toke
 
     //    return Ok(user);
     //}
-    [HttpGet("users")]
-    public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
-    {
-        GetUserByEmailQuery query = new()
-        {
-            Email = email
-        };
-        var user = await mediator.Send(query);
+    //[HttpGet("users")]
+    //public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
+    //{
+    //    GetUserByEmailQuery query = new()
+    //    {
+    //        Email = email
+    //    };
+    //    var user = await mediator.Send(query);
 
-        return Ok(user);
-    }
+    //    return Ok(user);
+    //}
     [HttpPut("refresh")]
     public async Task<IActionResult> RefreshToken()
     {

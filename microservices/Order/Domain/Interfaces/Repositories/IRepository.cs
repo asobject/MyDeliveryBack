@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using BuildingBlocks.Interfaces.Entities;
+using BuildingBlocks.Models;
 using System.Linq.Expressions;
 
 namespace Domain.Interfaces.Repositories

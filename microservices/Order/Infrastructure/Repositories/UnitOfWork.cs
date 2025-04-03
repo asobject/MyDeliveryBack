@@ -9,9 +9,8 @@ namespace Infrastructure.Repositories
     public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     {
         public IRepository<Order> Orders => new  OrderRepository(context);
-
         public IRepository<DeliveryPoint> DeliveryPoints => new Repository<DeliveryPoint>(context);
-
+        public IRepository<CustomPoint> CustomPoints => new Repository<CustomPoint>(context);
         public async Task<int> CompleteAsync() => await context.SaveChangesAsync();
         public async Task<ITransaction> BeginTransactionAsync()
         {

@@ -1,4 +1,4 @@
-﻿namespace Domain.Interfaces;
+﻿namespace BuildingBlocks.Interfaces.Entities;
 
 public interface IEntity
 {

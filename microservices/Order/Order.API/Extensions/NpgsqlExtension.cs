@@ -12,7 +12,8 @@ internal static class NpgsqlExtension
     {
         string connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString,
-            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
+             o => o.UseNetTopologySuite()
+                 .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 }

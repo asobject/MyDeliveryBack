@@ -26,7 +26,7 @@ public class TokenService(IAppConfiguration configuration) : ITokenService
     public JwtSecurityToken GenerateAccessToken(List<Claim> authClaims)
     {
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue("JWT_USER_SECRET")));
-        _ = int.TryParse(configuration.GetValue("JWT_CLIENT_ACCESS_TOKEN_VALIDITY"), out int tokenValidityInMinutes);
+        _ = int.TryParse(configuration.GetValue("JWT_USER_ACCESS_TOKEN_VALIDITY"), out int tokenValidityInMinutes);
 
         var token = new JwtSecurityToken(
             issuer: configuration.GetValue("JWT_ISSUER"),

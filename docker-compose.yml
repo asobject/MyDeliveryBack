@@ -33,4 +33,17 @@ services:
     build:
       context: .
       dockerfile: microservices/Order/Order.API/Dockerfile
+      
+
+
+  admin.api:
+    image: ${DOCKER_REGISTRY-}adminapi
+    build:
+      context: .
+      dockerfile: monolithics/Admin/Admin.API/Dockerfile
+  admin.api.migrations:
+    image: ${DOCKER_REGISTRY-}adminapi
+    build:
+      context: .
+      dockerfile: monolithics/Admin/Admin.API/Dockerfile
 

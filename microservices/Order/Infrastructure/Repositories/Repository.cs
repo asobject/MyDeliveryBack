@@ -1,6 +1,7 @@
-﻿using Domain.Interfaces;
+﻿using BuildingBlocks.Interfaces.Entities;
+using BuildingBlocks.Models;
+using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
-using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

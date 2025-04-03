@@ -1,7 +1,7 @@
 ﻿
 
+using BuildingBlocks.Interfaces.Entities;
 using Domain.Enums;
-using Domain.Interfaces;
 
 namespace Domain.Entities;
 

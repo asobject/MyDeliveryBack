@@ -95,6 +95,38 @@ services:
       - internal
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      
+ 
+  admin.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+    ports:
+      - "5011:8080"
+      - "5061:8081"
+    env_file:
+      - .env
+      - monolithics/Admin/Admin.API/.env
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - internal
+  admin.api.migrations:
+    profiles: ["migrations"]
+    environment:
+       - ASPNETCORE_ENVIRONMENT=Migration
+    env_file:
+      - monolithics/Admin/Admin.API/.env
+    networks:
+      - internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+
+
 
 networks:
   internal:
@@ -105,3 +137,5 @@ volumes:
   rabbitmq_data:
   redis_data:
   
+
+

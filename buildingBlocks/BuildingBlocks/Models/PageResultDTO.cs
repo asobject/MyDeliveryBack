@@ -1,4 +1,4 @@
-﻿namespace Domain.Models;
+﻿namespace BuildingBlocks.Models;
 
 public class PagedResultDTO<T>
 {

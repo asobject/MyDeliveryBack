@@ -13,7 +13,7 @@ public class RedisRefreshTokenStore(IConnectionMultiplexer redis, IConfiguration
 
     public async Task StoreTokenAsync(string userId, string jti, string refreshToken)
     {
-        var key = $"refresh_tokens:{userId}:{jti}";
+        var key = $"user_refresh_tokens:{userId}:{jti}";
         await _redis.StringSetAsync(key, refreshToken, _tokenLifetime);
     }
 
@@ -24,31 +24,31 @@ public class RedisRefreshTokenStore(IConnectionMultiplexer redis, IConfiguration
        string oldRefreshToken,
        string newRefreshToken)
     {
-        var storedToken = await _redis.StringGetAsync($"refresh_tokens:{userId}:{oldJti}");
+        var storedToken = await _redis.StringGetAsync($"user_refresh_tokens:{userId}:{oldJti}");
         if (storedToken != oldRefreshToken)
         {
             throw new InvalidTokenException("Invalid refresh token");
         }
 
-        await _redis.KeyDeleteAsync($"refresh_tokens:{userId}:{oldJti}");
+        await _redis.KeyDeleteAsync($"user_refresh_tokens:{userId}:{oldJti}");
 
         await StoreTokenAsync(userId, newJti, newRefreshToken);
         return true;
     }
     public async Task RevokeTokenAsync(string userId, string jti)
     {
-        if (!await _redis.KeyDeleteAsync($"refresh_tokens:{userId}:{jti}"))
+        if (!await _redis.KeyDeleteAsync($"user_refresh_tokens:{userId}:{jti}"))
         {
             throw new InvalidTokenException("Token not found");
         }
     }
     public async Task<bool> TokenExistsAsync(string userId, string jti)
     {
-        return await _redis.KeyExistsAsync($"refresh_tokens:{userId}:{jti}");
+        return await _redis.KeyExistsAsync($"user_refresh_tokens:{userId}:{jti}");
     }
     public async Task<string?> GetTokenAsync(string userId, string jti)
     {
-        var response = await _redis.StringGetAsync($"refresh_tokens:{userId}:{jti}");
+        var response = await _redis.StringGetAsync($"user_refresh_tokens:{userId}:{jti}");
         if (response == RedisValue.Null)
             throw new NotFoundException("Refresh token not found");
         return response;

@@ -112,26 +112,64 @@ public class CreateOrderCommandHandler(IUnitOfWork unitOfWork, IPublishEndpoint 
             throw new ConflictException($"Address is required for {target}'s CourierCall delivery.");
     }
     private async Task<DeliveryPoint> GetOrCreateDeliveryPoint(
-    DeliveryMethod method,
-    int? companyPointId,
-    string? address
-)
+     DeliveryMethod method,
+     int? companyPointId,
+     string? address)
     {
-        var query = method == DeliveryMethod.PickupPoint
-            ? unitOfWork.DeliveryPoints.FindAsync(p => p.Method == method && p.CompanyPointId == companyPointId)
-            : unitOfWork.DeliveryPoints.FindAsync(p => p.Method == method && p.Address == address);
+        DeliveryPoint? existingPoint = null;
 
-        var points = await query;
-        if (points.Any()) return points.Single();
+        if (method == DeliveryMethod.PickupPoint)
+        {
+            // Для пункта выдачи ищем по companyPointId
+            existingPoint = (await unitOfWork.DeliveryPoints.FindAsync(p =>
+                p.Method == method &&
+                p.CompanyPointId == companyPointId))
+                .FirstOrDefault();
+        }
+        else if (method == DeliveryMethod.CourierCall)
+        {
+            if (string.IsNullOrEmpty(address))
+                throw new ArgumentException("Address required for courier delivery");
 
+            // Находим или создаем кастомный пункт
+            var customPoint = await GetOrCreateCustomPoint(address);
+
+            // Ищем точку доставки с привязкой к кастомному пункту
+            existingPoint = (await unitOfWork.DeliveryPoints.FindAsync(p =>
+                p.Method == method &&
+                p.CustomPointId == customPoint.Id))
+                .FirstOrDefault();
+        }
+
+        if (existingPoint != null)
+            return existingPoint;
+
+        // Создаем новую точку доставки
         var newPoint = new DeliveryPoint
         {
             Method = method,
             CompanyPointId = method == DeliveryMethod.PickupPoint ? companyPointId : null,
-            Address = method == DeliveryMethod.CourierCall ? address : null
+            CustomPointId = method == DeliveryMethod.CourierCall
+                ? (await GetOrCreateCustomPoint(address!)).Id
+                : null
         };
 
         await unitOfWork.DeliveryPoints.AddAsync(newPoint);
+        await unitOfWork.CompleteAsync();
+        return newPoint;
+    }
+
+    private async Task<CustomPoint> GetOrCreateCustomPoint(string address)
+    {
+        var existing = (await unitOfWork.CustomPoints.FindAsync(c =>
+            c.Address == address))
+            .FirstOrDefault();
+
+        if (existing != null)
+            return existing;
+
+        var newPoint = new CustomPoint { Address = address };
+        await unitOfWork.CustomPoints.AddAsync(newPoint);
         await unitOfWork.CompleteAsync();
         return newPoint;
     }
